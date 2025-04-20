@@ -123,7 +123,7 @@
                 )
               ])
             ),
-            m('div', { class: 'container' }, [
+            m('div', { class: 'container mb-4' }, [
               this.state.activeTab === 'edit' ?
                 m('textarea', {
                   class: 'textarea',
@@ -135,15 +135,15 @@
               this.state.activeTab === 'learn' ?
                 m('div', [
                   m('div', { class: 'mb-4' }, [
-                    m('div', { class: 'flex flex-wrap gap-2' }, this.state.availableWords.map((word, index) =>
+                    m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.availableWords.map((word, index) =>
                       m('button', {
-                        class: 'button is-light',
+                        class: 'button is-light mr-1',
                         onclick: () => this.moveToUserSentence(word, index)
                       }, word)
                     )),
                     m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.userSentence.map((word, index) =>
                       m('button', {
-                        class: 'button is-info',
+                        class: 'button is-info mr-1',
                         onclick: () => this.moveBackToAvailableWords(word, index)
                       }, word)
                     ))
