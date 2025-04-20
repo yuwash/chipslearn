@@ -20,12 +20,16 @@
     <script>
       const app = {
         state: {
+          activeTab: 'edit',
           text: '',
           sentences: [],
           currentSentence: [],
           userSentence: [],
           score: 0,
           learning: false,
+        },
+        setActiveTab: function(tab) {
+          this.state.activeTab = tab;
         },
         setText: function(text) {
           this.state.text = text;
@@ -73,33 +77,49 @@
         },
         view: function() {
           return m('div', { class: 'section' }, [
+            m('div', { class: 'tabs is-centered' },
+              m('ul', [
+                m('li', { class: this.state.activeTab === 'edit' ? 'is-active' : '' },
+                  m('a', { onclick: () => this.setActiveTab('edit') }, 'Edit')
+                ),
+                m('li', { class: this.state.activeTab === 'learn' ? 'is-active' : '' },
+                  m('a', { onclick: () => this.setActiveTab('learn') }, 'Learn')
+                )
+              ])
+            ),
             m('div', { class: 'container' }, [
-              m('textarea', {
-                class: `textarea ${this.state.learning ? 'hidden' : ''}`,
-                value: this.state.text,
-                oninput: m.withAttr('value', this.setText.bind(this)),
-                placeholder: 'Paste your text here...'
-              }),
-              m('div', { class: 'mb-4' }, [
-                m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.userSentence.map((word, index) =>
+              this.state.activeTab === 'edit' ?
+                m('textarea', {
+                  class: 'textarea',
+                  value: this.state.text,
+                  oninput: m.withAttr('value', this.setText.bind(this)),
+                  placeholder: 'Paste your text here...'
+                })
+                : null,
+              this.state.activeTab === 'learn' ?
+                m('div', [
+                  m('div', { class: 'mb-4' }, [
+                    m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.userSentence.map((word, index) =>
+                      m('button', {
+                        class: 'button is-info',
+                        onclick: () => this.removeFromUserSentence(word, index)
+                      }, word)
+                    )),
+                    m('div', { class: 'flex flex-wrap gap-2' }, this.state.currentSentence.map((word, index) =>
+                      m('button', {
+                        class: 'button is-light',
+                        onclick: () => this.addToUserSentence(word, index)
+                      }, word)
+                    ))
+                  ]),
                   m('button', {
-                    class: 'button is-info',
-                    onclick: () => this.removeFromUserSentence(word, index)
-                  }, word)
-                )),
-                m('div', { class: 'flex flex-wrap gap-2' }, this.state.currentSentence.map((word, index) =>
-                  m('button', {
-                    class: 'button is-light',
-                    onclick: () => this.addToUserSentence(word, index)
-                  }, word)
-                ))
-              ]),
-              m('button', {
-                class: 'button is-success mb-4',
-                onclick: this.checkOrder.bind(this),
-                disabled: this.state.currentSentence.length > 0
-              }, 'Check Order'),
-              m('p', `Score: ${this.state.score}`)
+                    class: 'button is-success mb-4',
+                    onclick: this.checkOrder.bind(this),
+                    disabled: this.state.currentSentence.length > 0
+                  }, 'Check Order'),
+                  m('p', `Score: ${this.state.score}`)
+                ])
+                : null
             ])
           ]);
         }
