@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
    <script src="https://cdnjs.cloudflare.com/ajax/libs/mithril/1.1.6/mithril.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <script src="https://kit.fontawesome.com/6a52086692.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <title>JCode AI</title>
@@ -72,33 +72,35 @@
           }
         },
         view: function() {
-          return m('div', { class: 'p-4' }, [
-            m('textarea', {
-              class: `w-full h-32 p-2 mb-4 ${this.state.learning ? 'hidden' : ''}`,
-              value: this.state.text,
-              oninput: m.withAttr('value', this.setText.bind(this)),
-              placeholder: 'Paste your text here...'
-            }),
-            m('div', { class: 'mb-4' }, [
-              m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.userSentence.map((word, index) =>
-                m('button', {
-                  class: 'bg-blue-500 text-white p-2 rounded',
-                  onclick: () => this.removeFromUserSentence(word, index)
-                }, word)
-              )),
-              m('div', { class: 'flex flex-wrap gap-2' }, this.state.currentSentence.map((word, index) =>
-                m('button', {
-                  class: 'bg-gray-300 text-black p-2 rounded',
-                  onclick: () => this.addToUserSentence(word, index)
-                }, word)
-              ))
-            ]),
-            m('button', {
-              class: 'bg-green-500 text-white p-2 rounded mb-4',
-              onclick: this.checkOrder.bind(this),
-              disabled: this.state.currentSentence.length > 0
-            }, 'Check Order'),
-            m('p', `Score: ${this.state.score}`)
+          return m('div', { class: 'section' }, [
+            m('div', { class: 'container' }, [
+              m('textarea', {
+                class: `textarea ${this.state.learning ? 'hidden' : ''}`,
+                value: this.state.text,
+                oninput: m.withAttr('value', this.setText.bind(this)),
+                placeholder: 'Paste your text here...'
+              }),
+              m('div', { class: 'mb-4' }, [
+                m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.userSentence.map((word, index) =>
+                  m('button', {
+                    class: 'button is-info',
+                    onclick: () => this.removeFromUserSentence(word, index)
+                  }, word)
+                )),
+                m('div', { class: 'flex flex-wrap gap-2' }, this.state.currentSentence.map((word, index) =>
+                  m('button', {
+                    class: 'button is-light',
+                    onclick: () => this.addToUserSentence(word, index)
+                  }, word)
+                ))
+              ]),
+              m('button', {
+                class: 'button is-success mb-4',
+                onclick: this.checkOrder.bind(this),
+                disabled: this.state.currentSentence.length > 0
+              }, 'Check Order'),
+              m('p', `Score: ${this.state.score}`)
+            ])
           ]);
         }
       };
