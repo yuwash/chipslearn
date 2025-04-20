@@ -29,6 +29,8 @@
           score: 0,
           learning: false,
           message: '',
+          completedSentences: 0,
+          currentSentenceIndex: 0,
         },
          setActiveTab: function(tab) {
           this.state.activeTab = tab;
@@ -51,9 +53,11 @@
             []
           );
           console.log(this.state.sentences);
-          this.state.correctSentence = this.state.sentences.shift() || [];
+          this.state.currentSentenceIndex = 0;
+          this.state.correctSentence = this.state.sentences[this.state.currentSentenceIndex] || [];
           this.state.availableWords = [...this.state.correctSentence]; // Store the correct sentence
           this.shuffleSentence();
+          this.state.completedSentences = 0;
         },
         shuffleSentence: function() {
           this.state.availableWords.sort();
@@ -80,7 +84,8 @@
               },
               []
             );
-            this.state.correctSentence = this.state.sentences.shift() || [];
+            this.state.currentSentenceIndex = 0;
+            this.state.correctSentence = this.state.sentences[this.state.currentSentenceIndex] || [];
             this.state.availableWords = [...this.state.correctSentence];
             this.shuffleSentence();
             this.state.message = '';
@@ -89,7 +94,9 @@
           const correct = this.state.userSentence.join(' ') === this.state.correctSentence.join(' ');
           if (correct) {
             this.state.score += 1;
-            this.state.correctSentence = this.state.sentences.shift() || [];
+            this.state.completedSentences++;
+            this.state.currentSentenceIndex++;
+            this.state.correctSentence = this.state.sentences[this.state.currentSentenceIndex] || [];
             this.state.availableWords = [...this.state.correctSentence]; // Store the correct sentence
             if (this.state.correctSentence.length === 0) {
               this.state.message = 'Congratulations! You have completed the exercise!';
@@ -130,6 +137,10 @@
             message = this.state.message;
           }
 
+          const progress = 0 < this.state.sentences.length ? (
+            (this.state.completedSentences / this.state.sentences.length) * 100
+          ): 0;
+
           return m('div', { class: 'section' }, [
             m('div', { class: 'tabs is-centered' },
               m('ul', [
@@ -152,6 +163,7 @@
                 : null,
               this.state.activeTab === 'learn' ?
                 m('div', [
+                  m('progress', { class: 'progress is-success', value: progress, max: '100' }, `${progress}%`),
                   m('div', { class: 'mb-4' }, [
                     m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.availableWords.map((word, index) =>
                       m('button', {
