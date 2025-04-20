@@ -101,7 +101,11 @@
           if (this.state.activeTab === 'edit') {
             message = this.state.text === '' ? 'Enter text to get started!' : 'Go to the ‘Learn’ tab to start learning!';
           } else if (this.state.activeTab === 'learn') {
-            message = 'Click on the words in the right order to make the sentence.';
+            message = (
+              this.state.correctSentence.length === 0 ?
+              'Please go to the ‘edit’ tab to get started!' :
+              'Click on the words in the right order to make the sentence.'
+            );
           }
           if (this.state.message) {
             message = this.state.message;
