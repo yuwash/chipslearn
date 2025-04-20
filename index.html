@@ -67,6 +67,24 @@
           this.state.availableWords.push(word);
           this.state.userSentence.splice(index, 1);
         },
+         restart: function() {
+            this.state.sentences = this.state.text.match(/[^.!?]+[.!?]+/g) || [];
+            this.state.sentences = this.state.sentences.map(sentence => sentence.trim().split(/\s+/)).reduce(
+              (acc, current) => {
+                if (current.length < 5 && 0 < acc.length) {
+                  acc[acc.length - 1] = acc[acc.length - 1].concat(current);
+                } else if (0 < current.length) {
+                  acc.push(current);
+                }
+                return acc;
+              },
+              []
+            );
+            this.state.correctSentence = this.state.sentences.shift() || [];
+            this.state.availableWords = [...this.state.correctSentence];
+            this.shuffleSentence();
+            this.state.message = '';
+          },
         checkOrder: function() {
           const correct = this.state.userSentence.join(' ') === this.state.correctSentence.join(' ');
           if (correct) {
@@ -148,11 +166,17 @@
                       }, word)
                     ))
                   ]),
-                  m('button', {
-                    class: 'button is-success mb-4',
-                    onclick: this.checkOrder.bind(this),
-                    disabled: this.state.correctSentence.length === 0 || this.state.availableWords.length > 0
-                  }, 'Check Order'),
+                  m('div', { class: 'field is-grouped mb-4' }, [
+                    m('button', {
+                      class: 'button control is-success',
+                      onclick: this.checkOrder.bind(this),
+                      disabled: this.state.correctSentence.length === 0 || this.state.availableWords.length > 0
+                    }, 'Check Order'),
+                    m('button', {
+                      class: 'button control is-warning',
+                      onclick: () => this.restart()
+                    }, 'Restart'),
+                  ]),
                   m('p', `Score: ${this.state.score}`)
                 ])
                 : null
