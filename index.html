@@ -28,8 +28,9 @@
           correctSentence: [],
           score: 0,
           learning: false,
+          message: '',
         },
-        setActiveTab: function(tab) {
+         setActiveTab: function(tab) {
           this.state.activeTab = tab;
         },
         setText: function(text) {
@@ -71,7 +72,9 @@
             this.state.score += 1;
             this.state.correctSentence = this.state.sentences.shift() || [];
             this.state.currentSentence = [...this.state.correctSentence]; // Store the correct sentence
-            if (this.state.currentSentence.length > 0) {
+            if (this.state.correctSentence.length === 0) {
+              this.state.message = 'Congratulations! You have completed the exercise!';
+            } else {
               this.shuffleSentence();
             }
           } else {
@@ -94,6 +97,16 @@
           }
         },
         view: function() {
+          let message = '';
+          if (this.state.activeTab === 'edit') {
+            message = this.state.text === '' ? 'Enter text to get started!' : 'Go to the ‘Learn’ tab to start learning!';
+          } else if (this.state.activeTab === 'learn') {
+            message = 'Click on the words in the right order to make the sentence.';
+          }
+          if (this.state.message) {
+            message = this.state.message;
+          }
+
           return m('div', { class: 'section' }, [
             m('div', { class: 'tabs is-centered' },
               m('ul', [
@@ -138,7 +151,10 @@
                   m('p', `Score: ${this.state.score}`)
                 ])
                 : null
-            ])
+            ]),
+            m('div', {class: 'message'},
+              m('div', {class: 'message-body'}, message)
+            )
           ]);
         }
       };
