@@ -1,3 +1,49 @@
+const EditTab =  {
+  view: (vnode) => {
+    return m('textarea', {
+      class: 'textarea',
+      value: vnode.attrs.text,
+      oninput: (event) => vnode.attrs.setText(event),
+      placeholder: 'Paste your text here...'
+    });
+  }
+};
+
+const LearnTab = {
+  view: (vnode) => {
+    return m('div', [
+      m('progress', { class: 'progress is-success', value: vnode.attrs.progress, max: '100' }, `${vnode.attrs.progress}%`),
+      m('div', { class: 'mb-4' }, [
+        m('div', { class: 'flex flex-wrap gap-2 mb-2' }, vnode.attrs.availableWords.map((word, index) =>
+          m('button', {
+            class: `button ${word === vnode.attrs.hintWord ? 'is-success' : 'is-info'} mr-1`,
+            onclick: () => vnode.attrs.moveToUserSentence(word, index)
+          }, word)
+        )),
+        m('div', { class: 'flex flex-wrap gap-2 mb-2' }, vnode.attrs.userSentence.map((word, index) =>
+          m('button', {
+            class: 'button is-success mr-1',
+            onclick: () => vnode.attrs.moveBackToAvailableWords(word, index)
+          }, word)
+        ))
+      ]),
+      m('div', { class: 'field is-grouped mb-4' }, [
+        m('button', {
+          class: 'button control is-link',
+          onclick: () => vnode.attrs.hint(),
+          disabled: vnode.attrs.correctSentence.length === 0 || vnode.attrs.hintWord !== null
+        }, 'Hint'),
+        m('button', {
+          class: 'button control is-warning',
+          onclick: () => vnode.attrs.restart(),
+          disabled: vnode.attrs.sentences.length === 0
+        }, 'Restart'),
+      ]),
+      m('p', `Score: ${vnode.attrs.score}`)
+    ]);
+  }
+};
+
 const app = {
   state: {
     activeTab: 'edit',
@@ -13,7 +59,7 @@ const app = {
     currentSentenceIndex: 0,
     hintWord: null
   },
-   setActiveTab: function(tab) {
+  setActiveTab: function(tab) {
     this.state.activeTab = tab;
   },
   setText: function(event) {
@@ -156,44 +202,25 @@ const app = {
       ),
       m('div', { class: 'container mb-4' }, [
         this.state.activeTab === 'edit' ?
-          m('textarea', {
-            class: 'textarea',
-            value: this.state.text,
-            oninput: (event) => this.setText(event),
-            placeholder: 'Paste your text here...'
+          m(EditTab, {
+            text: this.state.text,
+            setText: this.setText.bind(this)
           })
           : null,
         this.state.activeTab === 'learn' ?
-          m('div', [
-            m('progress', { class: 'progress is-success', value: progress, max: '100' }, `${progress}%`),
-            m('div', { class: 'mb-4' }, [
-              m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.availableWords.map((word, index) =>
-                m('button', {
-                  class: `button ${word === this.state.hintWord ? 'is-success' : 'is-info'} mr-1`,
-                  onclick: () => this.moveToUserSentence(word, index)
-                }, word)
-              )),
-              m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.userSentence.map((word, index) =>
-                m('button', {
-                  class: 'button is-success mr-1',
-                  onclick: () => this.moveBackToAvailableWords(word, index)
-                }, word)
-              ))
-            ]),
-            m('div', { class: 'field is-grouped mb-4' }, [
-              m('button', {
-                class: 'button control is-link',
-                onclick: () => this.hint(),
-                disabled: this.state.correctSentence.length === 0 || this.state.hintWord !== null
-              }, 'Hint'),
-              m('button', {
-                class: 'button control is-warning',
-                onclick: () => this.restart(),
-                disabled: this.state.sentences.length === 0
-              }, 'Restart'),
-            ]),
-            m('p', `Score: ${this.state.score}`)
-          ])
+          m(LearnTab, {
+            progress: progress,
+            availableWords: this.state.availableWords,
+            userSentence: this.state.userSentence,
+            correctSentence: this.state.correctSentence,
+            hintWord: this.state.hintWord,
+            moveToUserSentence: this.moveToUserSentence.bind(this),
+            moveBackToAvailableWords: this.moveBackToAvailableWords.bind(this),
+            hint: this.hint.bind(this),
+            restart: this.restart.bind(this),
+            sentences: this.state.sentences,
+            score: this.state.score
+          })
           : null
       ]),
       m('div', {class: 'message'},
