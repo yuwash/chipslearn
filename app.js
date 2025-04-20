@@ -68,24 +68,8 @@ const LearnTab = {
       if (state.userSentence.length < state.correctSentence.length) {
         state.hintWord = state.correctSentence[state.userSentence.length];
       }
-    };
-
-    const restart = () => {
-      state.sentences = state.text.match(/[^.!?]+[.!?]+/g) || [];
-      state.sentences = state.sentences.map(sentence => sentence.trim().split(/\s+/)).reduce(
-        (acc, current) => {
-          if (current.length < 5 && 0 < acc.length) {
-            acc[acc.length - 1] = acc[acc.length - 1].concat(current);
-          } else if (0 < current.length) {
-            acc.push(current);
-          }
-          return acc;
-        },
-        []
-      );
-      state.currentSentenceIndex = 0;
-      vnode.attrs.resetSentence();
-      state.completedSentences = 0;
+      state.usedHints++;
+      state.sessionTotalUsedHints++;
     };
 
     const progress = 0 < state.sentences.length ? (
@@ -116,11 +100,12 @@ const LearnTab = {
         }, 'Hint'),
         m('button', {
           class: 'button control is-warning',
-          onclick: restart,
+          onclick: vnode.attrs.restart,
           disabled: state.sentences.length === 0
         }, 'Restart'),
       ]),
       m('p', `Score: ${state.score}`),
+      m('p', `Hints used: ${state.sessionTotalUsedHints}`),
     ]);
   }
 };
@@ -138,13 +123,18 @@ const app = {
     messageClass: 'info',
     completedSentences: 0,
     currentSentenceIndex: 0,
-    hintWord: null
+    hintWord: null,
+    usedHints: 0,
+    sessionTotalUsedHints: 0
   },
   setActiveTab: function(tab) {
     this.state.activeTab = tab;
   },
   setText: function(event) {
     this.state.text = event.target.value;
+    this.restart();
+  },
+  restart: function() {
     const sentences = this.state.text.match(/[^.!?]+[.!?]+/g) || [];
     this.state.sentences = sentences.map(sentence => sentence.trim().split(/\s+/)).reduce(
       (acc, current) => {
@@ -160,6 +150,7 @@ const app = {
     this.state.currentSentenceIndex = 0;
     this.resetSentence();
     this.state.completedSentences = 0;
+    this.state.sessionTotalUsedHints = 0;
   },
   resetSentence: function() {
     this.state.correctSentence = this.state.sentences[this.state.currentSentenceIndex] || [];
@@ -167,6 +158,7 @@ const app = {
     this.state.availableWords.sort();
     this.state.userSentence = [];
     this.state.hintWord = null;
+    this.state.usedHints = 0;
   },
   view: function() {
     let message = '';
@@ -207,6 +199,7 @@ const app = {
           m(LearnTab, {
             state: this.state,
             resetSentence: this.resetSentence.bind(this),
+            restart: this.restart.bind(this)
           })
           : null
       ]),
