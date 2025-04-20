@@ -122,7 +122,7 @@ const app = {
     ): 0;
 
     return m('div', { class: 'section' }, [
-      m('div', { class: 'tabs is-centered' },
+      m('div', { class: 'tabs is-centered is-boxed' },
         m('ul', [
           m('li', { class: this.state.activeTab === 'edit' ? 'is-active' : '' },
             m('a', { onclick: () => this.setActiveTab('edit') }, 'Edit')
