@@ -42,8 +42,8 @@
           this.state.sentences = sentences.map(sentence => sentence.split(/\s+/)).reduce(
             (acc, current) => {
               if (current.length < 5 && 0 < acc.length) {
-                acc[acc.length - 1] += " " + current;
-              } else {
+                acc[acc.length - 1] += current;
+              } else if (0 < current.length) {
                 acc.push(current);
               }
               return acc;
