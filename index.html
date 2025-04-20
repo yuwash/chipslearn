@@ -25,6 +25,7 @@
           sentences: [],
           currentSentence: [],
           userSentence: [],
+          correctSentence: [],
           score: 0,
           learning: false,
         },
@@ -47,7 +48,8 @@
             }
             return words.join(' ');
           }).map(sentence => sentence.split(/\s+/));
-          this.state.currentSentence = this.state.sentences.shift() || [];
+          this.state.correctSentence = this.state.sentences.shift() || [];
+          this.state.currentSentence = [...this.state.correctSentence]; // Store the correct sentence
           this.shuffleSentence();
         },
         shuffleSentence: function() {
@@ -66,19 +68,20 @@
           this.state.userSentence.splice(index, 1);
         },
         checkOrder: function() {
-          const correct = this.state.userSentence.join(' ') === this.state.currentSentence.join(' ');
+          const correct = this.state.userSentence.join(' ') === this.state.correctSentence.join(' ');
           if (correct) {
             this.state.score += 1;
-            this.state.currentSentence = this.state.sentences.shift() || [];
+            this.state.correctSentence = this.state.sentences.shift() || [];
+            this.state.currentSentence = [...this.state.correctSentence]; // Store the correct sentence
             if (this.state.currentSentence.length > 0) {
               this.shuffleSentence();
             }
           } else {
-            console.log('Incorrect', this.state.userSentence, this.state.currentSentence);
+            console.log('Incorrect', this.state.userSentence, this.state.correctSentence);
             // Find the index of the first incorrect word
             let incorrectIndex = 0;
             for (let i = 0; i < this.state.userSentence.length; i++) {
-              if (this.state.userSentence[i] !== this.state.currentSentence[i]) {
+              if (this.state.userSentence[i] !== this.state.correctSentence[i]) {
                 incorrectIndex = i;
                 break;
               }
