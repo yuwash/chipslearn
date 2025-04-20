@@ -73,6 +73,23 @@
             if (this.state.currentSentence.length > 0) {
               this.shuffleSentence();
             }
+          } else {
+            console.log('Incorrect', this.state.userSentence, this.state.currentSentence);
+            // Find the index of the first incorrect word
+            let incorrectIndex = 0;
+            for (let i = 0; i < this.state.userSentence.length; i++) {
+              if (this.state.userSentence[i] !== this.state.currentSentence[i]) {
+                incorrectIndex = i;
+                break;
+              }
+            }
+
+            // Move incorrect words back to currentSentence
+            for (let i = this.state.userSentence.length - 1; i >= incorrectIndex; i--) {
+              const word = this.state.userSentence[i];
+              this.state.currentSentence.push(word);
+              this.state.userSentence.splice(i, 1);
+            }
           }
         },
         view: function() {
