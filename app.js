@@ -39,6 +39,7 @@ const app = {
     this.state.availableWords = [...this.state.correctSentence]; // Store the correct sentence
     this.shuffleSentence();
     this.state.completedSentences = 0;
+    this.state.hintWord = null;
   },
   shuffleSentence: function() {
     this.state.availableWords.sort();
@@ -47,10 +48,15 @@ const app = {
   moveToUserSentence: function(word, index) {
     this.state.userSentence.push(word);
     this.state.availableWords.splice(index, 1);
+    if (this.state.availableWords.length === 0) {
+      this.checkOrder();
+    }
+    this.state.hintWord = null;
   },
   moveBackToAvailableWords: function(word, index) {
     this.state.availableWords.push(word);
     this.state.userSentence.splice(index, 1);
+    this.state.hintWord = null;
   },
   hint: function() {
      // Move incorrect words back to availableWords
@@ -176,17 +182,14 @@ const app = {
             ]),
             m('div', { class: 'field is-grouped mb-4' }, [
               m('button', {
-                class: 'button control is-success',
-                onclick: this.checkOrder.bind(this),
-                disabled: this.state.correctSentence.length === 0 || this.state.availableWords.length > 0
-              }, 'Check Order'),
-              m('button', {
                 class: 'button control is-link',
-                onclick: () => this.hint()
+                onclick: () => this.hint(),
+                disabled: this.state.correctSentence.length === 0 || this.state.hintWord !== null
               }, 'Hint'),
               m('button', {
                 class: 'button control is-warning',
-                onclick: () => this.restart()
+                onclick: () => this.restart(),
+                disabled: this.state.sentences.length === 0
               }, 'Restart'),
             ]),
             m('p', `Score: ${this.state.score}`)
