@@ -11,6 +11,7 @@ const app = {
     message: '',
     completedSentences: 0,
     currentSentenceIndex: 0,
+    hintWord: null
   },
    setActiveTab: function(tab) {
     this.state.activeTab = tab;
@@ -51,6 +52,21 @@ const app = {
     this.state.availableWords.push(word);
     this.state.userSentence.splice(index, 1);
   },
+  hint: function() {
+     // Move incorrect words back to availableWords
+     for (let i = this.state.userSentence.length - 1; i >= 0; i--) {
+       if (this.state.userSentence[i] !== this.state.correctSentence[i]) {
+         const word = this.state.userSentence[i];
+         this.state.availableWords.push(word);
+         this.state.userSentence.splice(i, 1);
+       }
+     }
+
+     // Highlight the next correct word
+     if (this.state.userSentence.length < this.state.correctSentence.length) {
+       this.state.hintWord = this.state.correctSentence[this.state.userSentence.length];
+     }
+   },
    restart: function() {
       this.state.sentences = this.state.text.match(/[^.!?]+[.!?]+/g) || [];
       this.state.sentences = this.state.sentences.map(sentence => sentence.trim().split(/\s+/)).reduce(
@@ -147,13 +163,13 @@ const app = {
             m('div', { class: 'mb-4' }, [
               m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.availableWords.map((word, index) =>
                 m('button', {
-                  class: 'button is-light mr-1',
+                  class: `button ${word === this.state.hintWord ? 'is-success' : 'is-info'} mr-1`,
                   onclick: () => this.moveToUserSentence(word, index)
                 }, word)
               )),
               m('div', { class: 'flex flex-wrap gap-2 mb-2' }, this.state.userSentence.map((word, index) =>
                 m('button', {
-                  class: 'button is-info mr-1',
+                  class: 'button is-success mr-1',
                   onclick: () => this.moveBackToAvailableWords(word, index)
                 }, word)
               ))
@@ -164,6 +180,10 @@ const app = {
                 onclick: this.checkOrder.bind(this),
                 disabled: this.state.correctSentence.length === 0 || this.state.availableWords.length > 0
               }, 'Check Order'),
+              m('button', {
+                class: 'button control is-link',
+                onclick: () => this.hint()
+              }, 'Hint'),
               m('button', {
                 class: 'button control is-warning',
                 onclick: () => this.restart()
