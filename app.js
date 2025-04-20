@@ -181,7 +181,7 @@ const app = {
     }
     const messageBulmaClass = `is-${messageClass}`;
 
-    return m('div', { class: 'section' }, [
+    return [
       m('div', { class: 'tabs is-centered is-boxed' },
         m('ul', [
           m('li', { class: this.state.activeTab === 'edit' ? 'is-active' : '' },
@@ -210,7 +210,7 @@ const app = {
       m('div', {class: `message ${messageBulmaClass}`},
         m('div', {class: 'message-body'}, message)
       )
-    ]);
+    ];
   }
 };
 
