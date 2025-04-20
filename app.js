@@ -86,7 +86,6 @@ const LearnTab = {
       state.currentSentenceIndex = 0;
       vnode.attrs.resetSentence();
       state.completedSentences = 0;
-      state.message = '';
     };
 
     const progress = 0 < state.sentences.length ? (
@@ -136,7 +135,7 @@ const app = {
     correctSentence: [],
     score: 0,
     learning: false,
-    message: '',
+    messageClass: 'info',
     completedSentences: 0,
     currentSentenceIndex: 0,
     hintWord: null
@@ -171,21 +170,20 @@ const app = {
   },
   view: function() {
     let message = '';
+    let messageClass = 'info';
     if (this.state.activeTab === 'edit') {
       message = this.state.text === '' ? 'Enter text to get started!' : 'Go to the ‘Learn’ tab to start learning!';
     } else if (this.state.activeTab === 'learn') {
-      message = (
-        this.state.sentences.length === 0 ?
-        'Please go to the ‘edit’ tab to get started!' : (
-          this.state.completedSentences < this.state.sentences.length ?
-          'Click on the words in the right order to make the sentence.':
-          'Congratulations! You have completed the exercise!'
-        )
-      );
+      if (this.state.sentences.length === 0) {
+        message = 'Please go to the ‘edit’ tab to get started!';
+      } else if (this.state.completedSentences < this.state.sentences.length) {
+        message = 'Click on the words in the right order to make the sentence.';
+      } else {
+        message = 'Congratulations! You have completed the exercise!';
+        messageClass = 'success';
+      }
     }
-    if (this.state.message) {
-      message = this.state.message;
-    }
+    const messageBulmaClass = `is-${messageClass}`;
 
     return m('div', { class: 'section' }, [
       m('div', { class: 'tabs is-centered is-boxed' },
@@ -212,7 +210,7 @@ const app = {
           })
           : null
       ]),
-      m('div', {class: 'message'},
+      m('div', {class: `message ${messageBulmaClass}`},
         m('div', {class: 'message-body'}, message)
       )
     ]);
