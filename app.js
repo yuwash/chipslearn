@@ -31,7 +31,11 @@ const LearnTab = {
     const checkOrder = () => {
       const correct = state.userSentence.join(' ') === state.correctSentence.join(' ');
       if (correct) {
-        state.score += 1;
+        if (state.usedHints === 0) {
+          state.score += 10;
+        } else {
+          state.score += Math.max(0, Math.round(10 * (state.correctSentence.length - state.usedHints) / state.correctSentence.length));
+        }
         state.completedSentences++;
         state.currentSentenceIndex++;
         vnode.attrs.resetSentence();
