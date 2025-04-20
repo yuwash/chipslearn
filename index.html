@@ -146,7 +146,7 @@
                   m('button', {
                     class: 'button is-success mb-4',
                     onclick: this.checkOrder.bind(this),
-                    disabled: this.state.currentSentence.length > 0
+                    disabled: this.state.correctSentence.length === 0 || this.state.currentSentence.length > 0
                   }, 'Check Order'),
                   m('p', `Score: ${this.state.score}`)
                 ])
