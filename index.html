@@ -38,25 +38,23 @@
         },
         processText: function() {
           const sentences = this.state.text.match(/[^.!?]+[.!?]+/g) || [];
-          this.state.sentences = sentences.map(sentence => {
-            const words = sentence.trim().split(/\s+/);
-            if (words.length < 5) {
-              const nextSentence = sentences.shift();
-              if (nextSentence) {
-                return words.concat(nextSentence.trim().split(/\s+/)).join(' ');
+          this.state.sentences = sentences.map(sentence => sentence.split(/\s+/)).reduce(
+            (acc, current) => {
+              if (current.length < 5 && 0 < acc.length) {
+                acc[acc.length - 1] += " " + current;
+              } else {
+                acc.push(current);
               }
-            }
-            return words.join(' ');
-          }).map(sentence => sentence.split(/\s+/));
+              return acc;
+            },
+            []
+          );
           this.state.correctSentence = this.state.sentences.shift() || [];
           this.state.currentSentence = [...this.state.correctSentence]; // Store the correct sentence
           this.shuffleSentence();
         },
         shuffleSentence: function() {
-          this.state.currentSentence = this.state.currentSentence
-            .map(word => ({ word, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ word }) => word);
+          this.state.currentSentence.sort();
           this.state.userSentence = [];
         },
         addToUserSentence: function(word, index) {
