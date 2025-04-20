@@ -15,8 +15,8 @@ const app = {
    setActiveTab: function(tab) {
     this.state.activeTab = tab;
   },
-  setText: function(text) {
-    this.state.text = text;
+  setText: function(event) {
+    this.state.text = event.target.value;
     this.processText();
   },
   processText: function() {
@@ -137,7 +137,7 @@ const app = {
           m('textarea', {
             class: 'textarea',
             value: this.state.text,
-            oninput: m.withAttr('value', this.setText.bind(this)),
+            oninput: (event) => this.setText(event),
             placeholder: 'Paste your text here...'
           })
           : null,
