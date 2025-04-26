@@ -11,7 +11,10 @@ class Chipslearn {
     hintWord: null,
     usedHints: 0,
     sessionTotalUsedHints: 0,
-    autocheckForWords: 2
+    autocheckForWords: 2,
+    totalTime: 0,
+    totalWords: 0,
+    lastMoveTime: null
   };
 
   constructor(state) {
@@ -22,6 +25,12 @@ class Chipslearn {
     return 0 < this.state.sentences.length ? (
       (this.state.completedSentences / this.state.sentences.length) * 100
     ): 0;
+  }
+
+  get averageTime() {
+    return 0 < this.state.totalTime ? (
+      this.state.totalTime / this.state.totalWords
+    ): null;
   }
 
   resetSentence() {
@@ -51,9 +60,13 @@ class Chipslearn {
     this.resetSentence();
     this.state.completedSentences = 0;
     this.state.sessionTotalUsedHints = 0;
+    this.state.totalTime = 0;
+    this.state.totalWords = 0;
+    this.state.lastMoveTime = performance.now();
   }
 
   moveToUserSentence(word, index) {
+    const now = performance.now();
     this.state.proposedSection.push(word);
     this.state.availableWords.splice(index, 1);
     if (this.state.availableWords.length === 0) {
@@ -73,6 +86,7 @@ class Chipslearn {
   checkOrder() {
     const correct = this.state.confirmedSection.concat(this.state.proposedSection).join(' ') === this.state.correctSentence.join(' ');
     if (correct) {
+      const now = performance.now();
       if (this.state.usedHints === 0) {
         this.state.score += 10;
       } else {
@@ -80,6 +94,9 @@ class Chipslearn {
       }
       this.state.completedSentences++;
       this.state.currentSentenceIndex++;
+      const timeTaken = now - this.state.lastMoveTime;
+      this.state.totalTime += timeTaken;
+      this.state.totalWords++;
       this.resetSentence();
     } else {
       this.moveBackIncorrectWords();
@@ -115,6 +132,28 @@ class Chipslearn {
     }
     this.state.usedHints++;
     this.state.sessionTotalUsedHints++;
+    this.state.lastMoveTime = performance.now();
+  }
+
+  moveBackIncorrectWords() {
+    this.state.lastMoveTime = performance.now();
+    const confirmedLength = this.state.confirmedSection.length;
+    const incorrectIndex = this.state.proposedSection.findIndex(
+      (word, index) => word !== this.state.correctSentence[confirmedLength + index]
+    )
+    if (incorrectIndex < 0) {  // Everything is correct.
+      this.state.confirmedSection.push(...this.state.proposedSection);
+      this.state.proposedSection = [];
+      return;
+    }
+
+    // Move correct words to confirmedSection
+    const additionalConfirmed = this.state.proposedSection.splice(0, incorrectIndex);
+    this.state.confirmedSection.push(...additionalConfirmed);
+
+    // Move incorrect words back to availableWords
+    this.state.availableWords.push(...this.state.proposedSection);
+    this.state.proposedSection = [];
   }
 }
 

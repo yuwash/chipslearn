@@ -76,6 +76,9 @@ const LearnTab = {
       ]),
       m('p', `Score: ${state.score}`),
       m('p', `Hints used: ${state.sessionTotalUsedHints}`),
+      (chipslearn.averageTime !== null) && m(
+        'p', `Average time: ${(chipslearn.averageTime/1000).toFixed(2)} s`
+      ),
     ]);
   }
 };
@@ -98,7 +101,9 @@ const app = {
       hintWord: null,
       usedHints: 0,
       sessionTotalUsedHints: 0,
-      autocheckForWords: 2
+      autocheckForWords: 2,
+      totalWords: 0,
+      lastMoveTime: null
   }),
   setActiveTab: function(tab) {
     this.state.activeTab = tab;
