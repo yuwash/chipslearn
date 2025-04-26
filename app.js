@@ -14,12 +14,9 @@ const EditTab =  {
 
 const LearnTab = {
   view: (vnode) => {
-    const state = vnode.attrs.state;
-    const chipslearn = new Chipslearn(state, vnode.attrs.resetSentence);
-
-    const progress = 0 < state.sentences.length ? (
-      (state.completedSentences / state.sentences.length) * 100
-    ): 0;
+    const chipslearn = vnode.attrs.chipslearn;
+    const state = chipslearn.state;
+    const progress = chipslearn.progress;
 
     return m('div', [
       m('progress', { class: 'progress is-success', value: progress, max: '100' }, `${progress}%`),
@@ -53,7 +50,7 @@ const LearnTab = {
         }, 'Hint'),
         m('button', {
           class: 'button control is-warning',
-          onclick: vnode.attrs.restart,
+          onclick: () => chipslearn.restart(vnode.attrs.text),
           disabled: state.sentences.length === 0
         }, 'Restart'),
       ]),
@@ -67,53 +64,27 @@ const app = {
   state: {
     activeTab: 'edit',
     text: '',
-    sentences: [],
-    availableWords: [],
-    confirmedSection: [],
-    proposedSection: [],
-    correctSentence: [],
-    score: 0,
-    learning: false,
     messageClass: 'info',
-    completedSentences: 0,
-    currentSentenceIndex: 0,
-    hintWord: null,
-    usedHints: 0,
-    sessionTotalUsedHints: 0
   },
+  chipslearn: new Chipslearn({
+      sentences: [],
+      availableWords: [],
+      confirmedSection: [],
+      proposedSection: [],
+      correctSentence: [],
+      score: 0,
+      completedSentences: 0,
+      currentSentenceIndex: 0,
+      hintWord: null,
+      usedHints: 0,
+      sessionTotalUsedHints: 0
+  }),
   setActiveTab: function(tab) {
     this.state.activeTab = tab;
   },
   setText: function(event) {
     this.state.text = event.target.value;
-    this.restart();
-  },
-  restart: function() {
-    const sentences = this.state.text.match(/[^.!?]+[.!?]+/g) || [];
-    this.state.sentences = sentences.map(sentence => sentence.trim().split(/\s+/)).reduce(
-      (acc, current) => {
-        if (current.length < 5 && 0 < acc.length) {
-          acc[acc.length - 1] = acc[acc.length - 1].concat(current);
-        } else if (0 < current.length) {
-          acc.push(current);
-        }
-        return acc;
-      },
-      []
-    );
-    this.state.currentSentenceIndex = 0;
-    this.resetSentence();
-    this.state.completedSentences = 0;
-    this.state.sessionTotalUsedHints = 0;
-  },
-  resetSentence: function() {
-    this.state.correctSentence = this.state.sentences[this.state.currentSentenceIndex] || [];
-    this.state.availableWords = [...this.state.correctSentence]; // Store the correct sentence
-    this.state.availableWords.sort();
-    this.state.confirmedSection = [];
-    this.state.proposedSection = [];
-    this.state.hintWord = null;
-    this.state.usedHints = 0;
+    this.chipslearn.restart(this.state.text);
   },
   view: function() {
     let message = '';
@@ -121,9 +92,9 @@ const app = {
     if (this.state.activeTab === 'edit') {
       message = this.state.text === '' ? 'Enter text to get started!' : 'Go to the ‘Learn’ tab to start learning!';
     } else if (this.state.activeTab === 'learn') {
-      if (this.state.sentences.length === 0) {
+      if (this.state.text === '') {
         message = 'Please go to the ‘edit’ tab to get started!';
-      } else if (this.state.completedSentences < this.state.sentences.length) {
+      } else if (this.chipslearn.progress < 100) {
         message = 'Click on the words in the right order to make the sentence.';
       } else {
         message = 'Congratulations! You have completed the exercise!';
@@ -152,9 +123,8 @@ const app = {
           : null,
         this.state.activeTab === 'learn' ?
           m(LearnTab, {
-            state: this.state,
-            resetSentence: this.resetSentence.bind(this),
-            restart: this.restart.bind(this)
+            chipslearn: this.chipslearn,
+            text: this.state.text
           })
           : null
       ]),

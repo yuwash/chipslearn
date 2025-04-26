@@ -1,15 +1,11 @@
 class Chipslearn {
   state = {
-    activeTab: 'edit',
-    text: '',
     sentences: [],
     availableWords: [],
     confirmedSection: [],
     proposedSection: [],
     correctSentence: [],
     score: 0,
-    learning: false,
-    messageClass: 'info',
     completedSentences: 0,
     currentSentenceIndex: 0,
     hintWord: null,
@@ -17,9 +13,43 @@ class Chipslearn {
     sessionTotalUsedHints: 0
   };
 
-  constructor(state, resetSentence) {
+  constructor(state) {
     this.state = state;
-    this.resetSentence = resetSentence;
+  }
+
+  get progress() {
+    return 0 < this.state.sentences.length ? (
+      (this.state.completedSentences / this.state.sentences.length) * 100
+    ): 0;
+  }
+
+  resetSentence() {
+    this.state.correctSentence = this.state.sentences[this.state.currentSentenceIndex] || [];
+    this.state.availableWords = [...this.state.correctSentence]; // Store the correct sentence
+    this.state.availableWords.sort();
+    this.state.confirmedSection = [];
+    this.state.proposedSection = [];
+    this.state.hintWord = null;
+    this.state.usedHints = 0;
+  }
+
+  restart(text) {
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+    this.state.sentences = sentences.map(sentence => sentence.trim().split(/\s+/)).reduce(
+      (acc, current) => {
+        if (current.length < 5 && 0 < acc.length) {
+          acc[acc.length - 1] = acc[acc.length - 1].concat(current);
+        } else if (0 < current.length) {
+          acc.push(current);
+        }
+        return acc;
+      },
+      []
+    );
+    this.state.currentSentenceIndex = 0;
+    this.resetSentence();
+    this.state.completedSentences = 0;
+    this.state.sessionTotalUsedHints = 0;
   }
 
   moveToUserSentence(word, index) {
