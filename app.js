@@ -54,22 +54,22 @@ const LearnTab = {
     return m('div', [
       m('progress', { class: 'progress is-success', value: progress, max: '100' }, `${progress}%`),
       m('div', { class: 'mb-4' }, [
-        m('div', { class: 'flex flex-wrap gap-2 mb-2' }, state.availableWords.map((word, index) =>
+        m('div', { class: 'flex flex-wrap' }, state.availableWords.map((word, index) =>
           m('button', {
-            class: `button ${word === state.hintWord ? 'is-success' : 'is-info'} mr-1`,
+            class: `button ${word === state.hintWord ? 'is-success' : 'is-info'} mr-1 mb-1`,
             onclick: () => chipslearn.moveToUserSentence(word, index)
           }, word)
         )),
-        m('div', { class: 'flex flex-wrap gap-2 mb-2' }, [
+        m('div', { class: 'flex flex-wrap mt-2' }, [
           state.confirmedSection.map((word, index) =>
             m('button', {
-              class: 'button is-black mr-1',
+              class: 'button is-black mr-1 mb-1',
               disabled: true
             }, word)
           ),
           state.proposedSection.map((word, index) =>
             m('button', {
-              class: 'button is-success mr-1',
+              class: 'button is-success mr-1 mb-1',
               onclick: () => chipslearn.moveBackToAvailableWords(word, index)
             }, word)
           )
