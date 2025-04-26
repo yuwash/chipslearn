@@ -77,7 +77,8 @@ const app = {
       currentSentenceIndex: 0,
       hintWord: null,
       usedHints: 0,
-      sessionTotalUsedHints: 0
+      sessionTotalUsedHints: 0,
+      autocheckForWords: 2
   }),
   setActiveTab: function(tab) {
     this.state.activeTab = tab;
