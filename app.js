@@ -27,6 +27,19 @@ const ConfigureTab = {
             vnode.attrs.setAutocheckForWords(value);
           }
         }
+      }),
+      m('label', { class: 'label' }, 'Auto hint after (milliseconds)'),
+      m('input', {
+        class: 'input',
+        type: 'number',
+        min: 0,
+        value: vnode.attrs.autoHintAfter,
+        oninput: (event) => {
+          const value = event.target.value === "" ? null : parseInt(event.target.value);
+          if (value === null || value >= 0) {
+            vnode.attrs.setAutoHintAfter(value);
+          }
+        }
       })
     ]);
   }
@@ -162,6 +175,11 @@ const app = {
             autocheckForWords: this.chipslearn.state.autocheckForWords,
             setAutocheckForWords: (value) => {
               this.chipslearn.state.autocheckForWords = value;
+            },
+            autoHintAfter: this.chipslearn.state.autoHintAfter,
+            setAutoHintAfter: (value) => {
+              this.chipslearn.state.autoHintAfter = value;
+              this.chipslearn.setupAutoHint();
             }
           })
           : null

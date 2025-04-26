@@ -162,6 +162,9 @@ class Chipslearn {
 
   setupAutoHint() {
     clearInterval(this.autoHintInterval); // Clear existing interval if any
+    if (!this.state.autoHintAfter) {
+      return;
+    }
     this.autoHintInterval = setInterval(() => {
       if (
         this.state.hintWord === null &&
