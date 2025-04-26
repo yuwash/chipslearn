@@ -79,33 +79,32 @@ class Chipslearn {
       this.state.currentSentenceIndex++;
       this.resetSentence();
     } else {
-      // Find the index of the first incorrect word
-      let incorrectIndex = 0;
-      for (let i = 0; i < this.state.proposedSection.length; i++) {
-        if (this.state.proposedSection[i] !== this.state.correctSentence[i]) {
-          incorrectIndex = i;
-          break;
-        }
-      }
-
-      // Move incorrect words back to availableWords
-      for (let i = this.state.proposedSection.length - 1; i >= incorrectIndex; i--) {
-        const word = this.state.proposedSection[i];
-        this.state.availableWords.push(word);
-        this.state.proposedSection.splice(i, 1);
-      }
+      this.moveBackIncorrectWords();
     }
   }
 
-  hint() {
-    // Move incorrect words back to availableWords
-    for (let i = this.state.proposedSection.length - 1; i >= 0; i--) {
-      if (this.state.proposedSection[i] !== this.state.correctSentence[i]) {
-        const word = this.state.proposedSection[i];
-        this.state.availableWords.push(word);
-        this.state.proposedSection.splice(i, 1);
-      }
+  moveBackIncorrectWords() {
+    const confirmedLength = this.state.confirmedSection.length;
+    const incorrectIndex = this.state.proposedSection.findIndex(
+      (word, index) => word !== this.state.correctSentence[confirmedLength + index]
+    )
+    if (incorrectIndex < 0) {  // Everything is correct.
+      this.state.confirmedSection.push(...this.state.proposedSection);
+      this.state.proposedSection = [];
+      return;
     }
+
+    // Move correct words to confirmedSection
+    const additionalConfirmed = this.state.proposedSection.splice(0, incorrectIndex);
+    this.state.confirmedSection.push(...additionalConfirmed);
+
+    // Move incorrect words back to availableWords
+    this.state.availableWords.push(...this.state.proposedSection);
+    this.state.proposedSection = [];
+  }
+
+  hint() {
+    this.moveBackIncorrectWords();
 
     // Highlight the next correct word
     if (this.state.proposedSection.length < this.state.correctSentence.length) {

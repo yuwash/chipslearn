@@ -30,7 +30,7 @@ const LearnTab = {
         m('div', { class: 'flex flex-wrap gap-2 mb-2' }, [
           state.confirmedSection.map((word, index) =>
             m('button', {
-              class: 'button is-static is-success mr-1',
+              class: 'button is-black mr-1',
               disabled: true
             }, word)
           ),
