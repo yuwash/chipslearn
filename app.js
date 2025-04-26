@@ -29,7 +29,7 @@ const LearnTab = {
     };
 
     const checkOrder = () => {
-      const correct = state.proposedSection.join(' ') === state.correctSentence.join(' ');
+      const correct = state.confirmedSection.concat(state.proposedSection).join(' ') === state.correctSentence.join(' ');
       if (correct) {
         if (state.usedHints === 0) {
           state.score += 10;
@@ -89,12 +89,20 @@ const LearnTab = {
             onclick: () => moveToUserSentence(word, index)
           }, word)
         )),
-        m('div', { class: 'flex flex-wrap gap-2 mb-2' }, state.proposedSection.map((word, index) =>
-          m('button', {
-            class: 'button is-success mr-1',
-            onclick: () => moveBackToAvailableWords(word, index)
-          }, word)
-        ))
+        m('div', { class: 'flex flex-wrap gap-2 mb-2' }, [
+          state.confirmedSection.map((word, index) =>
+            m('button', {
+              class: 'button is-static is-success mr-1',
+              disabled: true
+            }, word)
+          ),
+          state.proposedSection.map((word, index) =>
+            m('button', {
+              class: 'button is-success mr-1',
+              onclick: () => moveBackToAvailableWords(word, index)
+            }, word)
+          )
+        ])
       ]),
       m('div', { class: 'field is-grouped mb-4' }, [
         m('button', {
@@ -120,6 +128,7 @@ const app = {
     text: '',
     sentences: [],
     availableWords: [],
+    confirmedSection: [],
     proposedSection: [],
     correctSentence: [],
     score: 0,
@@ -160,6 +169,7 @@ const app = {
     this.state.correctSentence = this.state.sentences[this.state.currentSentenceIndex] || [];
     this.state.availableWords = [...this.state.correctSentence]; // Store the correct sentence
     this.state.availableWords.sort();
+    this.state.confirmedSection = [];
     this.state.proposedSection = [];
     this.state.hintWord = null;
     this.state.usedHints = 0;
