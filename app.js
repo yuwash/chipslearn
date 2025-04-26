@@ -1,3 +1,6 @@
+import Chipslearn from './chipslearn.js';
+
+
 const EditTab =  {
   view: (vnode) => {
     return m('textarea', {
@@ -12,69 +15,7 @@ const EditTab =  {
 const LearnTab = {
   view: (vnode) => {
     const state = vnode.attrs.state;
-
-    const moveToUserSentence = (word, index) => {
-      state.proposedSection.push(word);
-      state.availableWords.splice(index, 1);
-      if (state.availableWords.length === 0) {
-        checkOrder();
-      }
-      state.hintWord = null;
-    };
-
-    const moveBackToAvailableWords = (word, index) => {
-      state.availableWords.push(word);
-      state.proposedSection.splice(index, 1);
-      state.hintWord = null;
-    };
-
-    const checkOrder = () => {
-      const correct = state.confirmedSection.concat(state.proposedSection).join(' ') === state.correctSentence.join(' ');
-      if (correct) {
-        if (state.usedHints === 0) {
-          state.score += 10;
-        } else {
-          state.score += Math.max(0, Math.round(10 * (state.correctSentence.length - state.usedHints) / state.correctSentence.length));
-        }
-        state.completedSentences++;
-        state.currentSentenceIndex++;
-        vnode.attrs.resetSentence();
-      } else {
-        // Find the index of the first incorrect word
-        let incorrectIndex = 0;
-        for (let i = 0; i < state.proposedSection.length; i++) {
-          if (state.proposedSection[i] !== state.correctSentence[i]) {
-            incorrectIndex = i;
-            break;
-          }
-        }
-
-        // Move incorrect words back to availableWords
-        for (let i = state.proposedSection.length - 1; i >= incorrectIndex; i--) {
-          const word = state.proposedSection[i];
-          state.availableWords.push(word);
-          state.proposedSection.splice(i, 1);
-        }
-      }
-    };
-
-    const hint = () => {
-      // Move incorrect words back to availableWords
-      for (let i = state.proposedSection.length - 1; i >= 0; i--) {
-        if (state.proposedSection[i] !== state.correctSentence[i]) {
-          const word = state.proposedSection[i];
-          state.availableWords.push(word);
-          state.proposedSection.splice(i, 1);
-        }
-      }
-
-      // Highlight the next correct word
-      if (state.proposedSection.length < state.correctSentence.length) {
-        state.hintWord = state.correctSentence[state.proposedSection.length];
-      }
-      state.usedHints++;
-      state.sessionTotalUsedHints++;
-    };
+    const chipslearn = new Chipslearn(state, vnode.attrs.resetSentence);
 
     const progress = 0 < state.sentences.length ? (
       (state.completedSentences / state.sentences.length) * 100
@@ -86,7 +27,7 @@ const LearnTab = {
         m('div', { class: 'flex flex-wrap gap-2 mb-2' }, state.availableWords.map((word, index) =>
           m('button', {
             class: `button ${word === state.hintWord ? 'is-success' : 'is-info'} mr-1`,
-            onclick: () => moveToUserSentence(word, index)
+            onclick: () => chipslearn.moveToUserSentence(word, index)
           }, word)
         )),
         m('div', { class: 'flex flex-wrap gap-2 mb-2' }, [
@@ -99,7 +40,7 @@ const LearnTab = {
           state.proposedSection.map((word, index) =>
             m('button', {
               class: 'button is-success mr-1',
-              onclick: () => moveBackToAvailableWords(word, index)
+              onclick: () => chipslearn.moveBackToAvailableWords(word, index)
             }, word)
           )
         ])
@@ -107,7 +48,7 @@ const LearnTab = {
       m('div', { class: 'field is-grouped mb-4' }, [
         m('button', {
           class: 'button control is-link',
-          onclick: hint,
+          onclick: () => chipslearn.hint(),
           disabled: state.correctSentence.length === 0 || state.hintWord !== null
         }, 'Hint'),
         m('button', {
