@@ -20,6 +20,7 @@ class Chipslearn {
 
   constructor(state) {
     this.state = state;
+    this.setupAutoHint();
   }
 
   get progress() {
@@ -77,6 +78,7 @@ class Chipslearn {
       this.moveBackIncorrectWords();
     }
     this.state.hintWord = null;
+    this.state.lastMoveTime = now;
   }
 
   moveBackToAvailableWords(word, index) {
@@ -127,10 +129,11 @@ class Chipslearn {
 
   hint() {
     this.moveBackIncorrectWords();
+    const totalUserWords = this.state.confirmedSection.length + this.state.proposedSection.length;
 
     // Highlight the next correct word
-    if (this.state.proposedSection.length < this.state.correctSentence.length) {
-      this.state.hintWord = this.state.correctSentence[this.state.proposedSection.length];
+    if (totalUserWords < this.state.correctSentence.length) {
+      this.state.hintWord = this.state.correctSentence[totalUserWords];
     }
     this.state.usedHints++;
     this.state.sessionTotalUsedHints++;
@@ -138,7 +141,6 @@ class Chipslearn {
   }
 
   moveBackIncorrectWords() {
-    this.state.lastMoveTime = performance.now();
     const confirmedLength = this.state.confirmedSection.length;
     const incorrectIndex = this.state.proposedSection.findIndex(
       (word, index) => word !== this.state.correctSentence[confirmedLength + index]

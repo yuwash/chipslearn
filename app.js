@@ -103,7 +103,8 @@ const app = {
       sessionTotalUsedHints: 0,
       autocheckForWords: 2,
       totalWords: 0,
-      lastMoveTime: null
+      lastMoveTime: null,
+      autoHintAfter: 2000
   }),
   setActiveTab: function(tab) {
     this.state.activeTab = tab;
