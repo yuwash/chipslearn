@@ -14,7 +14,7 @@ const LearnTab = {
     const state = vnode.attrs.state;
 
     const moveToUserSentence = (word, index) => {
-      state.userSentence.push(word);
+      state.proposedSection.push(word);
       state.availableWords.splice(index, 1);
       if (state.availableWords.length === 0) {
         checkOrder();
@@ -24,12 +24,12 @@ const LearnTab = {
 
     const moveBackToAvailableWords = (word, index) => {
       state.availableWords.push(word);
-      state.userSentence.splice(index, 1);
+      state.proposedSection.splice(index, 1);
       state.hintWord = null;
     };
 
     const checkOrder = () => {
-      const correct = state.userSentence.join(' ') === state.correctSentence.join(' ');
+      const correct = state.proposedSection.join(' ') === state.correctSentence.join(' ');
       if (correct) {
         if (state.usedHints === 0) {
           state.score += 10;
@@ -42,35 +42,35 @@ const LearnTab = {
       } else {
         // Find the index of the first incorrect word
         let incorrectIndex = 0;
-        for (let i = 0; i < state.userSentence.length; i++) {
-          if (state.userSentence[i] !== state.correctSentence[i]) {
+        for (let i = 0; i < state.proposedSection.length; i++) {
+          if (state.proposedSection[i] !== state.correctSentence[i]) {
             incorrectIndex = i;
             break;
           }
         }
 
         // Move incorrect words back to availableWords
-        for (let i = state.userSentence.length - 1; i >= incorrectIndex; i--) {
-          const word = state.userSentence[i];
+        for (let i = state.proposedSection.length - 1; i >= incorrectIndex; i--) {
+          const word = state.proposedSection[i];
           state.availableWords.push(word);
-          state.userSentence.splice(i, 1);
+          state.proposedSection.splice(i, 1);
         }
       }
     };
 
     const hint = () => {
       // Move incorrect words back to availableWords
-      for (let i = state.userSentence.length - 1; i >= 0; i--) {
-        if (state.userSentence[i] !== state.correctSentence[i]) {
-          const word = state.userSentence[i];
+      for (let i = state.proposedSection.length - 1; i >= 0; i--) {
+        if (state.proposedSection[i] !== state.correctSentence[i]) {
+          const word = state.proposedSection[i];
           state.availableWords.push(word);
-          state.userSentence.splice(i, 1);
+          state.proposedSection.splice(i, 1);
         }
       }
 
       // Highlight the next correct word
-      if (state.userSentence.length < state.correctSentence.length) {
-        state.hintWord = state.correctSentence[state.userSentence.length];
+      if (state.proposedSection.length < state.correctSentence.length) {
+        state.hintWord = state.correctSentence[state.proposedSection.length];
       }
       state.usedHints++;
       state.sessionTotalUsedHints++;
@@ -89,7 +89,7 @@ const LearnTab = {
             onclick: () => moveToUserSentence(word, index)
           }, word)
         )),
-        m('div', { class: 'flex flex-wrap gap-2 mb-2' }, state.userSentence.map((word, index) =>
+        m('div', { class: 'flex flex-wrap gap-2 mb-2' }, state.proposedSection.map((word, index) =>
           m('button', {
             class: 'button is-success mr-1',
             onclick: () => moveBackToAvailableWords(word, index)
@@ -120,7 +120,7 @@ const app = {
     text: '',
     sentences: [],
     availableWords: [],
-    userSentence: [],
+    proposedSection: [],
     correctSentence: [],
     score: 0,
     learning: false,
@@ -160,7 +160,7 @@ const app = {
     this.state.correctSentence = this.state.sentences[this.state.currentSentenceIndex] || [];
     this.state.availableWords = [...this.state.correctSentence]; // Store the correct sentence
     this.state.availableWords.sort();
-    this.state.userSentence = [];
+    this.state.proposedSection = [];
     this.state.hintWord = null;
     this.state.usedHints = 0;
   },
