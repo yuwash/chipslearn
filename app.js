@@ -12,6 +12,26 @@ const EditTab =  {
   }
 };
 
+const ConfigureTab = {
+  view: (vnode) => {
+    return m('div', [
+      m('label', { class: 'label' }, 'Autocheck for words'),
+      m('input', {
+        class: 'input',
+        type: 'number',
+        min: 1,
+        value: vnode.attrs.autocheckForWords,
+        oninput: (event) => {
+          const value = parseInt(event.target.value);
+          if (value > 0) {
+            vnode.attrs.setAutocheckForWords(value);
+          }
+        }
+      })
+    ]);
+  }
+};
+
 const LearnTab = {
   view: (vnode) => {
     const chipslearn = vnode.attrs.chipslearn;
@@ -112,6 +132,9 @@ const app = {
           ),
           m('li', { class: this.state.activeTab === 'learn' ? 'is-active' : '' },
             m('a', { onclick: () => this.setActiveTab('learn') }, 'Learn')
+          ),
+          m('li', { class: this.state.activeTab === 'configure' ? 'is-active' : '' },
+            m('a', { onclick: () => this.setActiveTab('configure') }, 'Configure')
           )
         ])
       ),
@@ -126,6 +149,14 @@ const app = {
           m(LearnTab, {
             chipslearn: this.chipslearn,
             text: this.state.text
+          })
+          : null,
+        this.state.activeTab === 'configure' ?
+          m(ConfigureTab, {
+            autocheckForWords: this.chipslearn.state.autocheckForWords,
+            setAutocheckForWords: (value) => {
+              this.chipslearn.state.autocheckForWords = value;
+            }
           })
           : null
       ]),
