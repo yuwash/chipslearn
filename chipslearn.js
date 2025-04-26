@@ -58,7 +58,7 @@ class Chipslearn {
     this.state.availableWords.splice(index, 1);
     if (this.state.availableWords.length === 0) {
       this.checkOrder();
-    } else if (this.state.proposedSection.length >= this.state.autocheckForWords) {
+    } else if (this.state.autocheckForWords && this.state.proposedSection.length >= this.state.autocheckForWords) {
       this.moveBackIncorrectWords();
     }
     this.state.hintWord = null;

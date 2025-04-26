@@ -19,11 +19,11 @@ const ConfigureTab = {
       m('input', {
         class: 'input',
         type: 'number',
-        min: 1,
+        min: 0,
         value: vnode.attrs.autocheckForWords,
         oninput: (event) => {
-          const value = parseInt(event.target.value);
-          if (value > 0) {
+          const value = event.target.value === "" ? null : parseInt(event.target.value);
+          if (value === null || value > 0) {
             vnode.attrs.setAutocheckForWords(value);
           }
         }
