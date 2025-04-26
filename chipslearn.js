@@ -14,7 +14,8 @@ class Chipslearn {
     autocheckForWords: 2,
     totalTime: 0,
     totalWords: 0,
-    lastMoveTime: null
+    lastMoveTime: null,
+    autoHintAfter: 2000
   };
 
   constructor(state) {
@@ -63,6 +64,7 @@ class Chipslearn {
     this.state.totalTime = 0;
     this.state.totalWords = 0;
     this.state.lastMoveTime = performance.now();
+    this.setupAutoHint();
   }
 
   moveToUserSentence(word, index) {
@@ -154,6 +156,20 @@ class Chipslearn {
     // Move incorrect words back to availableWords
     this.state.availableWords.push(...this.state.proposedSection);
     this.state.proposedSection = [];
+  }
+
+  setupAutoHint() {
+    clearInterval(this.autoHintInterval); // Clear existing interval if any
+    this.autoHintInterval = setInterval(() => {
+      if (
+        this.state.hintWord === null &&
+        this.state.correctSentence.length > 0 &&
+        performance.now() - this.state.lastMoveTime > this.state.autoHintAfter
+      ) {
+        this.hint();
+        m.redraw(); // Trigger Mithril to redraw the view
+      }
+    }, this.state.autoHintAfter);
   }
 }
 
