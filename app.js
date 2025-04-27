@@ -140,6 +140,8 @@ const app = {
         message = 'Congratulations! You have completed the exercise!';
         messageClass = 'success';
       }
+    } else if (this.state.activeTab === 'configure') {
+      message = 'Go to the ‘Learn’ tab to start learning!';
     }
     const messageBulmaClass = `is-${messageClass}`;
 
